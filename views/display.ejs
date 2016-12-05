@@ -1,0 +1,93 @@
+
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+<meta charset="utf-8">
+<title><%= r.name %></title>
+<style>
+  /* Always set the map height explicitly to define the size of the div
+   * element that contains the map. */
+  #map {
+    height: 100%;
+  }
+  /* Optional: Makes the sample page fill the window. */
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+</style>
+<link rel="stylesheet" href="stylesheets/w3.css">
+<stype
+</head>
+<body>
+<script>
+function goBack() {window.history.back();}
+</script>
+<script>
+function loadMap ()
+{
+  var myLatLng = {lat: <%= r.address.coord[1] %>, lng: <%= r.address.coord[0] %>};
+  //var myLatLng = new google.maps.LatLng({lat: <%= r.address.coord[1] %>, lng: <%= r.address.coord[0] %>});
+  var map = new google.maps.Map(document.getElementById("map"),{
+        zoom: 18,
+        center: myLatLng
+  });
+  var marker = new google.maps.Marker({
+     position: myLatLng,
+     map: map,
+     title: '<%= r.name %>'
+  });
+}
+</script>
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkKp-JmH_NYJriRbCXLFCyWk3ifDw9uuo&callback=loadMap"></script>
+<div class="w3-container w3-teal">
+  <h1><%= r.name %></h1>
+</div>
+<% if(r.data){if(r.data.length > 0){ %>
+  <img src="data: <%= r.mimetype %>;base64, <%= r.data %>"
+      class="w3-image w3-border w3-padding" style="width:100%">
+	  <% }} %>
+
+<div class="w3-container">
+<p>
+<label class="w3-label w3-validate">Borough: </label><%= r.borough %></p>
+<label class="w3-label w3-validate">Cuisine: </label><%= r.cuisine %></p>
+<label class="w3-label w3-validate">Street: </label><%= r.address.street %></p>
+<label class="w3-label w3-validate">Building: </label><%= r.address.building %></p>
+<label class="w3-label w3-validate">Zipcode: </label><%= r.address.zipcode %></p>
+<label class="w3-label w3-validate">GPS: </label>[<%= r.address.coord[0] %>][<%= r.address.coord[1] %>]</p>
+<label class="w3-label w3-validate">Rating: </label></p>
+ 
+
+  
+  <ol>
+	<% if(r.grades.length > 0){ %>
+		<% r.grades.forEach(function(grade) { %>
+		<li><%= grade.score %> (<%= grade.user %>)</li>
+    <% });                        }%>
+
+  </ol>
+
+<p>
+<label class="w3-label w3-validate">Created by: </label><%= r.userid %></p>
+<p>
+</div>
+
+  <a href="/gmap?lat=<%= r.address.coord[1] %>&lon=<%= r.address.coord[0] %>&title=<%= r.name %>">Google Map</a>
+
+<div class="w3-container">
+<a href="/rate?_id=<%= r._id %>&ampname=<%= r.name %>" style="text-decoration: none">
+    <button class="w3-btn w3-section w3-teal w3-ripple">Rate</button>
+</a>
+<a href="/change?_id=<%= r._id %>" style="text-decoration: none">
+  <button class="w3-btn w3-section w3-teal w3-ripple">Edit</button>
+</a>
+<a href="/remove?_id=<%= r._id %>" style="text-decoration: none">
+  <button class="w3-btn w3-section w3-teal w3-ripple">Delete</button>
+</a>
+<button class="w3-btn w3-section w3-teal w3-ripple" onclick="goBack()">Go Back</button>
+</div>
+</body>
+</html>

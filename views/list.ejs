@@ -1,0 +1,41 @@
+<html>
+<head>
+  <title>Restaurant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="stylesheets/w3.css">
+  <script>
+	  function goBack() {window.history.back();}
+  </script>
+</head>
+<body>
+<header class="w3-container w3-teal">
+  <h1>Restaurants</h1>
+  
+    <p>User: <%= userid %></p>
+  
+  <p>Showing <%= r.length %> documents
+  (criteria: <%= criteria %>)</p>
+</header>
+<div class="w3-container">
+<a href="/new" style="text-decoration: none"><button class="w3-btn">New</button></a>
+<a href="/reg" style="text-decoration: none"><button class="w3-btn">Register</button></a>
+<a href="/login" style="text-decoration: none"><button class="w3-btn">Login</button></a>
+<a href="/logout" style="text-decoration: none"><button class="w3-btn">Logout</button></a>
+<button class="w3-btn w3-section w3-teal w3-ripple" onclick="goBack()">Go Back</button>
+</div>
+<br>
+<div class="w3-container">
+  <ul class="w3-ul w3-large">
+  
+  <% r.forEach(function(restaurant) { %>
+  <li><a href="/display?_id=<%= restaurant._id %>"><%= restaurant.name %></a></li>
+  <% });                        %>
+  
+  </ul>
+</div>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,83 @@
+var mongo = process.env.VCAP_SERVICES;
+var MongoClient = require('mongodb').MongoClient;
+var conn_str = "";
+var express = require('express');
+var app = express();
+
+// Connect MongoDb by using VCAP_SERVICES preference, otherwise, using localhost
+if (mongo) {
+  var env = JSON.parse(mongo);
+  if (env['mongodb']) {
+    mongo = env['mongodb'][0]['credentials'];
+    if (mongo.url) {
+      conn_str = mongo.url;
+    } else {
+	  res.write
+      console.log("No mongo found");
+    }  
+  } else {
+    conn_str = 'mongodb://localhost:27017';
+  }
+} else {
+  conn_str = 'mongodb://localhost:27017';
+}
+
+// serve the files out of ./public as our main files
+app.use(express.static(__dirname + '/public'));
+
+
+/*app.get('/', function (req, res) {
+  res.write('Two APIs are provided: "/api/insertMessage" and "/api/render"' + "\n"
+    + 'When "/api/insertMessage" is called, messages will be written to database' + "\n"
+    + 'When "/api/render" is called, the inserted message will be shown');
+  res.end();
+});*/
+
+app.get('/insert', function (req, res) {
+  var message = { 'message': 'Hello, Bluemix', 'ts': new Date() };
+
+  MongoClient.connect(mongo.url, function(err, db) {
+		console.log('Connected to MongoDB\n');
+		db.collection('messages').insert(message, {safe:true}, function(err){
+		if (err) { 
+			console.log(err.stack);
+			res.write('mongodb message insert failed');
+			res.end(); 
+		} else {
+			res.write('following messages has been inserted into database' + "\n" 
+			+ JSON.stringify(message));
+			res.end();
+		}
+	});
+  });
+});
+
+app.get('/read', function (req, res) {
+  MongoClient.connect(mongo.url, function(err, db) {
+    // list messages
+    db.collection('messages').find({}, {limit:10, sort:[['_id', 'desc']]}, function(err, cursor) {
+      if (err) {
+        console.log(err.stack); 
+        res.write('mongodb message list failed');
+        res.end();
+      } else {
+        cursor.toArray(function(err, items) {
+          if (err) {
+            console.log(err.stack); 
+            res.write('mongodb cursor to array failed');
+            res.end();
+          } else {
+            res.writeHead(200, {'Content-Type': 'text/plain'});
+            for (i=0; i < items.length; i++) {
+              res.write(JSON.stringify(items[i]) + "\n");
+            }
+            res.end();
+          }
+        });
+      }
+    });     
+  });
+});
+
+var port = process.env.PORT || 3030;
+app.listen(port);
